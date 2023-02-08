@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, send_file
+from flask import Flask, render_template, request, redirect, send_file, make_response
 import requests
 import json
 from fuzzywuzzy import fuzz
@@ -148,6 +148,12 @@ def redir(prodotto):
             
     return json.dumps(result)
 
+
+@app.route('/')
+def index():
+    return make_response('ok', 200)
+
+
 # start the server with the 'run()' method
 if __name__ == '__main__':
 
@@ -166,5 +172,4 @@ if __name__ == '__main__':
 
     #Rimetto i permessi di root
     setuid(0)
-
     app.run(debug=True,port=80,host='23.94.219.145')
