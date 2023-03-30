@@ -1,0 +1,99 @@
+#Insert mock data:
+    """ It's generally a good practice to follow a specific order when inserting data into tables that have foreign key relationships with each other. 
+    You should insert the data in the order of the dependency, i.e., insert data into the table that has no dependencies first, 
+    followed by tables that depend on the previous table. """
+
+    user1 = User(name='John', email='john@example.com', profile_pic='pic1.jpg')
+    user2 = User(name='Jane', email='jane@example.com', profile_pic='pic2.jpg')
+    session.add(user1)
+    session.add(user2)
+
+    session.commit()
+
+
+    recipe1 = Recipe(title='Pasta', category='Italian', image_url='pasta.jpg')
+    recipe2 = Recipe(title='Burger', category='American', image_url='burger.jpg')
+    session.add(recipe1)
+    session.add(recipe2)
+
+    session.commit()
+
+
+    ingredient1 = Ingredient(name='Pasta', unit='g')
+    ingredient2 = Ingredient(name='Tomato sauce', unit='tbsp')
+    session.add(ingredient1)
+    session.add(ingredient2)
+
+    session.commit()
+
+    product1 = Product(barcode='123456789', ingredient_id=ingredient1.id, name='Spaghetti', brand='Barilla', labels=[True, False, False], eco_score=3, nova_score=3, big_image_url='spaghetti.jpg', mini_image_url='spaghetti_mini.jpg', meal=[True, False, False, True], allergens=['Wheat'], quantity=500)
+    product2 = Product(barcode='987654321', ingredient_id=ingredient2.id, name='Tomato sauce', brand='Hunt\'s', labels=[False, True, False], eco_score=2, nova_score=2, big_image_url='tomato_sauce.jpg', mini_image_url='tomato_sauce_mini.jpg', meal=[False, True, True, False], allergens=['Tomatoes'], quantity=500)
+    session.add(product1)
+    session.add(product2)
+
+    session.commit()
+
+
+    feedback1 = Feedback(user=user1, recipe_id=1, rating=4, notes='Good recipe')
+    feedback2 = Feedback(user=user2, recipe_id=2, rating=5, notes='Great recipe')
+    session.add(feedback1)
+    session.add(feedback2)
+
+    session.commit()
+
+    step1 = Step(recipe=recipe1, n_step=1, image_url='step1.jpg', explaining='Cook pasta in boiling water')
+    step2 = Step(recipe=recipe1, n_step=2, image_url='step2.jpg', explaining='Mix pasta with sauce')
+    session.add(step1)
+    session.add(step2)
+
+    session.commit()
+
+    recipe_ingredient1 = RecipeIngredient(recipe=recipe1, ingredient_id=ingredient1.id, product_id=product1.id, amount_text='200g', amount=200.0)
+    recipe_ingredient2 = RecipeIngredient(recipe=recipe1, ingredient_id=ingredient2.id, product_id=product2.id, amount_text='1 tbsp', amount=1.0)
+    session.add(recipe_ingredient1)
+    session.add(recipe_ingredient2)
+
+    session.commit()
+
+    fridge1 = Fridge(name='Kitchen fridge')
+    fridge2 = Fridge(name='Garage fridge')
+    session.add(fridge1)
+    session.add(fridge2)
+
+    session.commit()
+
+
+    user_fridge1 = UserFridge(user_id=user1.id, fridge_id=fridge1.id)
+    user_fridge2 = UserFridge(user_id=user2.id, fridge_id=fridge2.id)
+    session.add(user_fridge1)
+    session.add(user_fridge2)
+
+    session.commit()
+
+
+    fridge_product1 = FridgeProduct(fridge_id=fridge1.id, product=product1, quantity=2)
+    fridge_product2 = FridgeProduct(fridge_id=fridge2.id, product=product2, quantity=3)
+    session.add(fridge_product1)
+    session.add(fridge_product2)
+
+    session.commit()
+    
+
+
+
+
+
+
+
+
+
+
+    #############°OLD METHOD :
+
+    user = session.query(User).filter(User.id == user_id).first()
+
+    # Create a list of serialized recipe dictionaries
+    recipe_list = []
+    for recipe in user.feedbacked_recipes:
+        recipe_dict = RecipeSchema().dump(recipe)
+        recipe_list.append(recipe_dict)
