@@ -1,0 +1,8 @@
+.controlbar{
+    transition: margin-left 0.3s;
+}
+
+.controlbar.open {
+  margin-left: 300px;
+  transition: margin-left 0.3s;
+}
