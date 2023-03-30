@@ -2,6 +2,7 @@ from marshmallow_sqlalchemy import SQLAlchemySchema, auto_field
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
+from marshmallow import fields
 
 Base = declarative_base()
 
@@ -26,7 +27,7 @@ class FridgeSchema(SQLAlchemySchema):
     id = auto_field()
     name = auto_field()
 
-    """ users = fields.Nested('UserSchema', many=True)
-    fridge_products = fields.Nested('FridgeProductSchema', many=True) """
+    users = fields.Nested('UserSchema', many=True)
+    fridge_products = fields.Nested('FridgeProductSchema', many=True)
 
 ####################################################################################

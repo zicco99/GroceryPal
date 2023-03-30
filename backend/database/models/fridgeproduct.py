@@ -35,5 +35,3 @@ class FridgeProductSchema(SQLAlchemySchema):
 
 
 ####################################################################################
-# Endpoints controller
-fridgeproduct_schema = FridgeProductSchema()

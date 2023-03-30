@@ -19,7 +19,9 @@ import sys
 # Import controllers
 sys.path.append("../")
 from database.bootstrapDB import *
-from controllers import login,fridge,product,recipe,user,feedback
+from controllers import login_contr,fridge_contr,product_contr,recipe_contr,ingredient_contr
+
+
 
 ###################################################################################################
 
@@ -41,10 +43,11 @@ login_manager.login_view = 'login_google'
 client = WebApplicationClient(Config.GOOGLE_CLIENT_ID)
 
 
-app.register_blueprint(login.bp, url_prefix='/api')
-app.register_blueprint(fridge.bp, url_prefix='/api')
-app.register_blueprint(product.bp, url_prefix='/api')
-app.register_blueprint(recipe.bp, url_prefix='/api')
+app.register_blueprint(login_contr.bp, url_prefix='/api')
+app.register_blueprint(fridge_contr.bp, url_prefix='/api')
+app.register_blueprint(product_contr.bp, url_prefix='/api')
+app.register_blueprint(recipe_contr.bp, url_prefix='/api')
+app.register_blueprint(ingredient_contr.bp, url_prefix='/api')
 
 
 

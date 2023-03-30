@@ -1,5 +1,5 @@
-from backend.controllers.recipe import InsertRecipe
-from backend.database.bootstrapDB import *
+from controllers.recipe_contr import InsertRecipe
+from database.bootstrapDB import *
 import re
 from bs4 import BeautifulSoup
 import requests

@@ -19,8 +19,6 @@ from database.models.feedback import *
 from database.models.fridge import *
 
 # Global vars
-metadata_obj = None
-session = None
 Base = declarative_base()
 
 

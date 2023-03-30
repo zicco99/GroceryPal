@@ -1,0 +1,2 @@
+#TODO make smoother controllers code
+#TODO each controller has to have a session object (dependency injection)

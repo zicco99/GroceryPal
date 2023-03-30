@@ -1,3 +1,7 @@
+#TODO update the code to a smoother version
+#TODO
+
+
 import sys
 import requests
 sys.path.append("../")
@@ -180,3 +184,85 @@ def get_product(barcode):
         insert_product(p)
 
         return jsonify(ProductSchema.dump(p))
+
+
+""" def create_product():
+    # Get data from the request body
+    data = request.get_json()
+
+    # Load data into the Product schema
+    try:
+        product = product_schema.load(data, session=db.session)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+    # Add the new Product to the database
+    db.session.add(product)
+
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        return jsonify({"error": "A product with that barcode already exists."}), 400
+
+    # Return the created Product object in the response
+    return product_schema.jsonify(product), 201
+
+
+def get_product(id):
+    # Find the Product object with the given id
+    product = Product.query.get(id)
+
+    # If the Product doesn't exist, return a 404 error
+    if not product:
+        return jsonify({"error": "Product not found."}), 404
+
+    # Return the Product object in the response
+    return product_schema.jsonify(product)
+
+
+def update_product(id):
+    # Find the Product object with the given id
+    product = Product.query.get(id)
+
+    # If the Product doesn't exist, return a 404 error
+    if not product:
+        return jsonify({"error": "Product not found."}), 404
+
+    # Get data from the request body
+    data = request.get_json()
+
+    # Load data into the Product schema
+    try:
+        product = product_schema.load(
+            data, instance=product, session=db.session)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+    # Update the Product in the database
+    db.session.add(product)
+
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        return jsonify({"error": "A product with that barcode already exists."}), 400
+
+    # Return the updated Product object in the response
+    return product_schema.jsonify(product)
+
+
+def delete_product(id):
+    # Find the Product object with the given id
+    product = Product.query.get(id)
+
+    # If the Product doesn't exist, return a 404 error
+    if not product:
+        return jsonify({"error": "Product not found."}), 404
+
+    # Delete the Product from the database
+    db.session.delete(product)
+    db.session.commit()
+
+    # Return a success message in the response
+    return jsonify({"message": "Product successfully deleted."}) """
