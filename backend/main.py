@@ -408,11 +408,6 @@ if __name__ == '__main__':
     t.daemon = True
     t.start()
 
-    # Declare and start the recipe composer daemon thread
-    t = threading.Thread(target=scrap)
-    t.daemon = True
-    t.start()
-
     context = ('ssl_certificate/grocerypal.it.crt', 'ssl_certificate/grocerypal.it.key')
     #app.run(debug=True,port=4000,host='localhost',ssl_context=context)
     app.run(debug=True,port=4000,host='localhost')
