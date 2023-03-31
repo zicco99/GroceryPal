@@ -83,10 +83,6 @@ def create_app(config_class, connection_string):
     login_contr.session = session
     recipe_contr.session = session
     user_contr.session = session
-    
-    # Start a background thread for web scraping
-    scrap_thread = threading.Thread(target=scrap, args=(app, session), daemon=True)
-    scrap_thread.start()
 
     return app, session, metadata
 
@@ -94,6 +90,12 @@ def create_app(config_class, connection_string):
 if __name__ == '__main__':
     connection_string = 'postgresql://{}:{}@{}:{}/{}'.format(
         Config.USERNAME_ROLE, Config.PASSWORD_ROLE, Config.DB_IP, Config.PORT, Config.DB_NAME)
+    
     app, session, metadata = create_app(Config, connection_string)
     app.run(debug=True, port=4000, host='localhost')
+
+    # Start a background thread for web scraping
+    scrap_thread = threading.Thread(target=scrap, args=(app, session), daemon=True)
+    scrap_thread.start()
+    
     # app.run(debug=True,port=4000,host='localhost',ssl_context=context)

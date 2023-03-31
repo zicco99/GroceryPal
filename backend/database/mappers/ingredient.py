@@ -1,12 +1,10 @@
+from marshmallow import fields
 from marshmallow_sqlalchemy import SQLAlchemySchema, auto_field
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship,registry
-from marshmallow import fields
+from sqlalchemy.orm import registry, relationship
 
 from ..DBootstrap import custom_base
-#################### Class and Schema definition ###############################
-
 
 class Ingredient(custom_base):
     __tablename__ = 'ingredient'
@@ -38,5 +36,4 @@ class IngredientSchema(SQLAlchemySchema):
         'ProductSchema', many=True, exclude=('can_be_used_as',))
 
 
-####################################################################################
 

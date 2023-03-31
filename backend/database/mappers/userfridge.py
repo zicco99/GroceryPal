@@ -5,8 +5,6 @@ from sqlalchemy.orm import relationship,registry
 from marshmallow import fields
 
 from ..DBootstrap import custom_base
-#################### Class and Schema definition ###############################
-
 
 class UserFridge(custom_base):
     __tablename__ = 'user_fridge'
@@ -28,6 +26,4 @@ class UserFridgeSchema(SQLAlchemySchema):
     is_admin = auto_field()
     is_owner = auto_field()
 
-
-####################################################################################
 

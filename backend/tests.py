@@ -4,25 +4,26 @@ from sqlalchemy import create_engine
 from config import Config
 from main import create_app
 
-#Import models
-from database.models.feedback import *
-from database.models.user import *
-from database.models.userfridge import *
-from database.models.step import *
-from database.models.recipeingredient import *
-from database.models.product import *
-from database.models.ingredient import *
-from database.models.fridgeproduct import *
-from database.models.recipe import *
-from database.models.fridge import *
+# Import models
+from database.mappers.feedback import *
+from database.mappers.user import *
+from database.mappers.userfridge import *
+from database.mappers.step import *
+from database.mappers.recipeingredient import *
+from database.mappers.product import *
+from database.mappers.ingredient import *
+from database.mappers.fridgeproduct import *
+from database.mappers.recipe import *
+from database.mappers.fridge import *
+
 
 class TestCase(unittest.TestCase):
-    
+
     def setUp(self):
         self.connection_string = 'postgresql://{}:{}@{}:{}/{}'.format(
             Config.TEST_USERNAME_ROLE, Config.TEST_PASSWORD_ROLE, Config.TEST_DB_IP, Config.TEST_PORT, Config.TEST_DB_NAME)
-        
-        app, session, metadata = create_app(Config,self.connection_string)
+
+        app, session, metadata = create_app(Config, self.connection_string)
         self.session = session
         self.metadata = metadata
         self.client = app.test_client
@@ -32,7 +33,7 @@ class TestCase(unittest.TestCase):
         self.metadata.drop_all(bind=engine)
 
     ############################### ENDPOINT TESTING #############################################
-    
+
     def test_get_feedbacks(self):
         response = self.client().get('api/feedback')
         print(response)

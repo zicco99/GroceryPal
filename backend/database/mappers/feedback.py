@@ -6,8 +6,6 @@ from marshmallow import fields
 
 from ..DBootstrap import custom_base
 
-#################### Class and Schema definition ###############################
-
 class Feedback(custom_base):
     __tablename__ = 'feedback'
     id = Column(Integer, autoincrement=True, primary_key=True)
@@ -37,6 +35,4 @@ class FeedbackSchema(SQLAlchemySchema):
     user = fields.Nested('UserSchema', exclude=('feedback',))
     recipe = fields.Nested('RecipeSchema', exclude=('feedback',))
 
-
-####################################################################################
 

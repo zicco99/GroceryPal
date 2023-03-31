@@ -5,7 +5,6 @@ from sqlalchemy.orm import relationship,registry
 from marshmallow import fields
 
 from ..DBootstrap import custom_base
-#################### Class and Schema definition ###############################
 
 class Fridge(custom_base):
     __tablename__ = 'fridge'
@@ -30,4 +29,3 @@ class FridgeSchema(SQLAlchemySchema):
     fridge_products = fields.Nested('FridgeProductSchema', many=True)
 
 
-####################################################################################
