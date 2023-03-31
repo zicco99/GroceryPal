@@ -1,7 +1,7 @@
 import sys
 from psycopg2 import IntegrityError
 sys.path.append("../")
-from database.bootstrapDB import *
+from database.DBootstrap import *
 from flask_login import login_user
 from flask import Blueprint, jsonify, request
 

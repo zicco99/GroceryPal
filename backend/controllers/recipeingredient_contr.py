@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from marshmallow import ValidationError
 from psycopg2 import IntegrityError
-from database.bootstrapDB import *
+from database.DBootstrap import *
 import sys
 sys.path.append("../")
 

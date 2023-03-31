@@ -1,23 +1,27 @@
 from marshmallow_sqlalchemy import SQLAlchemySchema, auto_field
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship,registry
 from marshmallow import fields
 
-Base = declarative_base()
-
+from ..DBootstrap import custom_base
 #################### Class and Schema definition ###############################
 
 
-class Recipe(Base):
+class Recipe(custom_base):
     __tablename__ = 'recipe'
     id = Column(Integer, autoincrement=True, primary_key=True)
     title = Column(String)
     category = Column(String)
     image_url = Column(String)
 
+    def __init__(self, title, category, image_url):
+        self.title = title
+        self.category = category
+        self.image_url = image_url
+
     # Relationships
-    feedback = relationship('Feedback', back_populates='recipe')
+    feedback = relationship("Feedback", back_populates='recipe')
     users_who_feedback = relationship(
         'User', secondary='feedback', back_populates='feedbacked_recipes', lazy='dynamic', overlaps="feedback,user,recipe")
     steps = relationship('Step', back_populates='recipe')
@@ -36,7 +40,7 @@ class RecipeSchema(SQLAlchemySchema):
     image_url = auto_field()
 
     feedback = fields.Nested('FeedbackSchema', many=True,
-                             exclude=('recipe', 'user'))
+                             exclude=('recipe', 'user'), lazy='dynamic')
     users_who_feedback = fields.List(fields.Nested(
         'UserSchema', exclude=('feedbacked_recipes', 'fridges', 'feedback')))
     steps = fields.Nested('StepSchema', many=True, exclude=())
@@ -45,3 +49,4 @@ class RecipeSchema(SQLAlchemySchema):
 
 
 ####################################################################################
+

@@ -1,7 +1,7 @@
 from flask_login import login_user
 from flask import Blueprint, jsonify, request
 from psycopg2 import IntegrityError
-from database.bootstrapDB import *
+from database.DBootstrap import *
 from controllers.user_contr import insert_db_if_misses
 
 bp = Blueprint('feedback', __name__)

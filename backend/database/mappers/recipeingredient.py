@@ -1,15 +1,14 @@
 from marshmallow_sqlalchemy import SQLAlchemySchema, auto_field
 from sqlalchemy import Column, Float, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship,registry
 from marshmallow import fields
 
-Base = declarative_base()
-
+from ..DBootstrap import custom_base
 #################### Class and Schema definition ###############################
 
 
-class RecipeIngredient(Base):
+class RecipeIngredient(custom_base):
     __tablename__ = 'recipe_ingredient'
     id = Column(Integer, autoincrement=True, primary_key=True)
     recipe_id = Column(Integer, ForeignKey('recipe.id'))
@@ -42,4 +41,6 @@ class RecipeIngredientSchema(SQLAlchemySchema):
     product = fields.Nested(
         'ProductSchema', exclude=('used_in_recipe_ingredient',))
 
+
 ####################################################################################
+

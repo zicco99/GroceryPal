@@ -1,14 +1,12 @@
 from marshmallow_sqlalchemy import SQLAlchemySchema, auto_field
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
-
-Base = declarative_base()
+from sqlalchemy.orm import relationship,registry
+from ..DBootstrap import custom_base
 
 #################### Class and Schema definition ###############################
 
-
-class Step(Base):
+class Step(custom_base):
     __tablename__ = 'step'
     id = Column(Integer, autoincrement=True, primary_key=True)
     recipe_id = Column(Integer, ForeignKey('recipe.id'))
@@ -31,4 +29,6 @@ class StepSchema(SQLAlchemySchema):
     image_url = auto_field()
     explaining = auto_field()
 
+
 ####################################################################################
+

@@ -1,10 +1,11 @@
-from controllers.recipe_contr import InsertRecipe
-from database.bootstrapDB import *
+from flask import jsonify
+from database.DBootstrap import *
 import re
 from bs4 import BeautifulSoup
 import requests
 
 debug = False
+recipe_schema = RecipeSchema()
 
 
 def findTitle(soup):
@@ -53,7 +54,7 @@ def findSteps(soup):
     return steps
 
 
-def scrap():
+def scrap(app,session):
     # TODO Choose a way to choose when to refresh recipes (last update on a .txt)
 
     while (True):
@@ -75,11 +76,46 @@ def scrap():
                 link = tag.a.get('href')
                 response = requests.get(link)
                 soup = BeautifulSoup(response.text, 'html.parser')
-                try:
-                    InsertRecipe(title=findTitle(soup), category=findCategory(soup), ingredients=findIngredients(soup),
-                                 steps=findSteps(soup), image_url=findImage(soup))
-                except:
-                    continue
+                
+                #Create the recipe object
+                new_recipe = Recipe(
+                    title=findTitle(soup),
+                    category=findCategory(soup),
+                    image_url=findImage(soup),
+                )
+
+                new_recipe.recipe_ingredients = []
+                for ingredientName, quantityAndUnit in findIngredients(soup):
+                    match = re.search(r"^(\d+)\s*(g|gr|ml)", quantityAndUnit)
+                    if match:
+                        quant = int(match.group(1))
+                        unit = match.group(2)
+                    else:
+                        quant = -1
+                        unit = ""
+                    
+                    # Check if ingredient already exists
+                    ingredient = session.query(Ingredient).filter_by(name=ingredientName).first()
+
+                    # If ingredient doesn't exist, create new ingredient object and add to session
+                    if not ingredient:
+                        ingredient = Ingredient(name=ingredientName, unit=unit)
+                        session.add(ingredient)
+                        session.commit()
+                    
+                    new_recipe.recipe_ingredients.append(RecipeIngredient(ingredient=ingredient,recipe=new_recipe, amount=quant, amount_text=quantityAndUnit))
+
+                new_recipe.steps = []
+                for i, (url, exp) in enumerate(findSteps(soup)):
+                    new_step = Step(recipe=new_recipe, n_step=i,
+                                    image_url=url, explaining=exp)
+                    session.add(new_step)
+                    new_recipe.steps.append(new_step)
+
+                #Add the recipe simulating a post 
+                with app.app_context():
+                    app.post('api/recipes', data=jsonify(recipe_schema.dump(new_recipe)))
+
 
         # Wait 24 and repeat (Naive solution)
         time.sleep(24 * 60 * 60)

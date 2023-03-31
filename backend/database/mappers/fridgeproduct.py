@@ -1,15 +1,15 @@
 from marshmallow_sqlalchemy import SQLAlchemySchema, auto_field
 from sqlalchemy import Column, ForeignKey, Integer
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship,registry
 from marshmallow import fields
 
-Base = declarative_base()
+from ..DBootstrap import custom_base
 
 #################### Class and Schema definition ###############################
 
 
-class FridgeProduct(Base):
+class FridgeProduct(custom_base):
     __tablename__ = 'fridge_product'
     id = Column(Integer, primary_key=True, autoincrement=True)
     fridge_id = Column(Integer, ForeignKey('fridge.id'))

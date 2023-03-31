@@ -1,15 +1,14 @@
 from marshmallow_sqlalchemy import SQLAlchemySchema, auto_field
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship,registry
 from marshmallow import fields
 
-Base = declarative_base()
-
+from ..DBootstrap import custom_base
 #################### Class and Schema definition ###############################
 
 
-class Ingredient(Base):
+class Ingredient(custom_base):
     __tablename__ = 'ingredient'
 
     id = Column(Integer, autoincrement=True, primary_key=True)
@@ -40,3 +39,4 @@ class IngredientSchema(SQLAlchemySchema):
 
 
 ####################################################################################
+

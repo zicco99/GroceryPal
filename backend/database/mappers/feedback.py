@@ -1,14 +1,14 @@
 from marshmallow_sqlalchemy import SQLAlchemySchema, auto_field
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship,registry
 from marshmallow import fields
 
-Base = declarative_base()
+from ..DBootstrap import custom_base
 
 #################### Class and Schema definition ###############################
 
-class Feedback(Base):
+class Feedback(custom_base):
     __tablename__ = 'feedback'
     id = Column(Integer, autoincrement=True, primary_key=True)
     user_id = Column(Integer, ForeignKey('user.id'))
@@ -37,4 +37,6 @@ class FeedbackSchema(SQLAlchemySchema):
     user = fields.Nested('UserSchema', exclude=('feedback',))
     recipe = fields.Nested('RecipeSchema', exclude=('feedback',))
 
+
 ####################################################################################
+

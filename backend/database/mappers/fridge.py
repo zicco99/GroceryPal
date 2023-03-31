@@ -1,14 +1,13 @@
 from marshmallow_sqlalchemy import SQLAlchemySchema, auto_field
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship,registry
 from marshmallow import fields
 
-Base = declarative_base()
-
+from ..DBootstrap import custom_base
 #################### Class and Schema definition ###############################
 
-class Fridge(Base):
+class Fridge(custom_base):
     __tablename__ = 'fridge'
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)
@@ -29,5 +28,6 @@ class FridgeSchema(SQLAlchemySchema):
 
     users = fields.Nested('UserSchema', many=True)
     fridge_products = fields.Nested('FridgeProductSchema', many=True)
+
 
 ####################################################################################

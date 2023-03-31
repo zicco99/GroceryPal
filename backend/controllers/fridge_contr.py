@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_login import login_user
 from flask import Blueprint, jsonify, request
-from database.bootstrapDB import *
+from database.DBootstrap import *
 
 
 bp = Blueprint('fridge', __name__)

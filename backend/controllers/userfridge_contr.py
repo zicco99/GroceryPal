@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from database.bootstrapDB import *
+from database.DBootstrap import *
 import sys
 sys.path.append("../")
 

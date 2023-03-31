@@ -1,6 +1,6 @@
 import sys
 sys.path.append("../")
-from database.bootstrapDB import *
+from database.DBootstrap import *
 from flask import Blueprint, jsonify, request
 
 

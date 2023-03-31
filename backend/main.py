@@ -7,7 +7,7 @@ from influxdb_client import User
 from oauthlib.oauth2 import WebApplicationClient
 
 from config import Config
-from database.bootstrapDB import bootstrap_db
+from database.DBootstrap import bootstrap_db
 from giallozafferano_scraping.scraping import scrap
 
 import threading
@@ -83,9 +83,10 @@ def create_app(config_class, connection_string):
     login_contr.session = session
     recipe_contr.session = session
     user_contr.session = session
-
+    
     # Start a background thread for web scraping
-    threading.Thread(target=scrap, daemon=True).start()
+    scrap_thread = threading.Thread(target=scrap, args=(app, session), daemon=True)
+    scrap_thread.start()
 
     return app, session, metadata
 

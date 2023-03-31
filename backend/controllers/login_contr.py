@@ -3,7 +3,7 @@ from flask_login import login_required, login_user, logout_user
 from flask import Blueprint, Config, redirect, request
 import json
 from http import client
-from database.bootstrapDB import *
+from database.DBootstrap import *
 import sys
 from backend.controllers.user_contr import get_user, insert_db_if_misses
 sys.path.append("../")

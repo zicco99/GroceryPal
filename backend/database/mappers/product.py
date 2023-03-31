@@ -1,15 +1,14 @@
 from marshmallow_sqlalchemy import SQLAlchemySchema, auto_field
 from sqlalchemy import ARRAY, Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship,registry
 from marshmallow import fields
 
-Base = declarative_base()
-
+from ..DBootstrap import custom_base
 #################### Class and Schema definition ###############################
 
 
-class Product(Base):
+class Product(custom_base):
     __tablename__ = 'product'
     id = Column(Integer, primary_key=True, autoincrement=True)
     barcode = Column(String, unique=True)
@@ -55,3 +54,4 @@ class ProductSchema(SQLAlchemySchema):
         'FridgeProductSchema', exclude=('product',))
 
 ####################################################################################
+

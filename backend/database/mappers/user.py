@@ -2,13 +2,14 @@ from flask_login import UserMixin
 from marshmallow_sqlalchemy import SQLAlchemySchema, auto_field
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship,registry
 from marshmallow import fields
-Base = declarative_base()
+
+from ..DBootstrap import custom_base
 
 #################### Class and Schema definition ###############################
 
-class User(Base, UserMixin):
+class User(custom_base, UserMixin):
     __tablename__ = 'user'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -43,3 +44,4 @@ class UserSchema(SQLAlchemySchema):
 
 
 ####################################################################################
+

@@ -1,24 +1,20 @@
-from flask_login import UserMixin
 from marshmallow_sqlalchemy import SQLAlchemySchema, auto_field
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship,registry
 from marshmallow import fields
 
-Base = declarative_base()
-
+from ..DBootstrap import custom_base
 #################### Class and Schema definition ###############################
 
 
-class UserFridge(Base):
+class UserFridge(custom_base):
     __tablename__ = 'user_fridge'
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('user.id'))
     fridge_id = Column(Integer, ForeignKey('fridge.id'))
     is_admin = Column(Boolean)
     is_owner = Column(Boolean)
-
-    # Relationships
 
 
 class UserFridgeSchema(SQLAlchemySchema):
@@ -34,3 +30,4 @@ class UserFridgeSchema(SQLAlchemySchema):
 
 
 ####################################################################################
+
