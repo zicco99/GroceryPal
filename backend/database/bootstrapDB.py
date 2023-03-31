@@ -2,33 +2,32 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine, func, inspect
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import MetaData
-from config import Config
 import time
 import sys
 
 # Import models
-from database.models.userfridge import *
 from database.models.user import *
-from database.models.step import *
-from database.models.recipeingredient import *
-from database.models.product import *
 from database.models.ingredient import *
-from database.models.fridgeproduct import *
-from database.models.recipe import *
+from database.models.product import *
 from database.models.feedback import *
+from database.models.recipe import *
 from database.models.fridge import *
+from database.models.fridgeproduct import *
+from database.models.recipeingredient import *
+from database.models.step import *
+from database.models.userfridge import *
+
 
 # Global vars
 Base = declarative_base()
 
 
-def bootstrap_db():
+def bootstrap_db(connection_string):
     global session
     global metadata
 
     # Establishing DB connection
-    engine = create_engine(
-        'postgresql://{}:{}@{}:{}/{}'.format(Config.USERNAME_ROLE, Config.PASSWORD_ROLE, Config.DB_IP, Config.PORT, Config.DB_NAME))
+    engine = create_engine(connection_string)
     Session = sessionmaker(bind=engine)
     session = Session()
     metadata = MetaData()
@@ -61,3 +60,5 @@ def bootstrap_db():
 
                         print("Done,starting fetching....")
                         break
+    
+    return session,metadata

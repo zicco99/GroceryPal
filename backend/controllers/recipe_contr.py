@@ -6,7 +6,7 @@ from psycopg2 import IntegrityError
 from database.bootstrapDB import *
 import sys
 
-from controllers.user import insert_db_if_misses
+from controllers.user_contr import insert_db_if_misses
 sys.path.append("../")
 
 bp = Blueprint('recipe', __name__)

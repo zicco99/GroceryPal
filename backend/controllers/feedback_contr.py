@@ -2,19 +2,19 @@ from flask_login import login_user
 from flask import Blueprint, jsonify, request
 from psycopg2 import IntegrityError
 from database.bootstrapDB import *
-import sys
-from backend.controllers.user import insert_db_if_misses
-sys.path.append("../")
+from controllers.user_contr import insert_db_if_misses
 
-bp = Blueprint('feedback', __name__,url_prefix='/feedback')
+bp = Blueprint('feedback', __name__)
+session = None
 
 feedback_schema = FeedbackSchema()
 feedbacks_schema = FeedbackSchema(many=True)
 
 
+
 @bp.route('/', methods=['GET'])
 def get_feedbacks():
-    feedbacks = Feedback.query.all()
+    feedbacks = session.query(Feedback).all()
     return jsonify(feedbacks_schema(feedbacks))
 
 
@@ -64,7 +64,7 @@ def update_feedback(id):
             feedback.is_chosen = is_chosen
             feedback.rating = rating
             feedback.notes = notes
-            
+
             session.commit()
             return jsonify(feedback_schema.dump(feedback))
         except IntegrityError:
@@ -85,8 +85,7 @@ def delete_feedback(id):
         return jsonify({'message': 'Feedback not found'}), 404
 
 
-
-#TODO choose a better solution for both endpoints
+# TODO choose a better solution for both endpoints
 @bp.route('/user-feedbacks/<int:user_id>', methods=['GET'])
 def get_user_id_feedbacks(user_id):
     feedbacks = Feedback.query.filter_by(user_id=user_id).all()

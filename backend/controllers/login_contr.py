@@ -5,14 +5,14 @@ import json
 from http import client
 from database.bootstrapDB import *
 import sys
-from backend.controllers.user import get_user, insert_db_if_misses
+from backend.controllers.user_contr import get_user, insert_db_if_misses
 sys.path.append("../")
 
 
 bp = Blueprint('login', __name__)
 
 
-@bp.route('/login_google')
+@bp.route('/google')
 def login_google():
     # Find out what URL to hit for Google login
     google_provider_cfg = requests.get(Config.GOOGLE_DISCOVERY_URL).json()
@@ -28,7 +28,7 @@ def login_google():
     return redirect(request_uri)
 
 
-@bp.route('/login_google/callback')
+@bp.route('/google/callback')
 def google_callback():
     # Get authorization code Google sent back to you
     code = request.args.get("code")
@@ -87,9 +87,3 @@ def google_callback():
     # Send user back to homepage
     return redirect("/#/home")
 
-
-@bp.route("/logout")
-@login_required
-def logout():
-    logout_user()
-    return redirect("/")

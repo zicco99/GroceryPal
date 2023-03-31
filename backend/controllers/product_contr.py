@@ -1,7 +1,3 @@
-#TODO update the code to a smoother version
-#TODO
-
-
 import sys
 import requests
 sys.path.append("../")
