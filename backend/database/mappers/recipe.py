@@ -45,5 +45,3 @@ class RecipeSchema(SQLAlchemySchema):
         'RecipeIngredientSchema', many=True, exclude=('ingredient',))
 
 
-####################################################################################
-

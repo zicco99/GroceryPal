@@ -1,12 +1,12 @@
-import React, { Component } from 'react';
-import { ChakraProvider, theme } from '@chakra-ui/react';
-import Controlbar from './components/controlbar/Controlbar';
-import AppContext from './components/context';
-import Sidebar from './components/sidebar/Sidebar';
-import { BrowserRouter } from 'react-router-dom';
-import BarcodeScanner from './pages/BarcodeScanner';
-import Discovery from './pages/Discovery';
-import FridgePage from './pages/FridgePage';
+import React, { Component } from "react";
+import { ChakraProvider, theme } from "@chakra-ui/react";
+import Controlbar from "./components/controlbar/Controlbar";
+import AppContext from "./components/context";
+import Sidebar from "./components/sidebar/Sidebar";
+import { BrowserRouter } from "react-router-dom";
+import BarcodeScanner from "./pages/scan/BarcodeScanner";
+import Discovery from "./pages/Discovery";
+import FridgePage from "./pages/FridgePage";
 
 class App extends Component {
   constructor(props) {
@@ -18,7 +18,7 @@ class App extends Component {
   }
 
   toggleSidebar() {
-    this.setState(prevState => ({ sidebarOpened: !prevState.sidebarOpened }));
+    this.setState((prevState) => ({ sidebarOpened: !prevState.sidebarOpened }));
   }
 
   render() {
@@ -27,13 +27,13 @@ class App extends Component {
 
     var content;
     switch (path) {
-      case '/discovery':
+      case "/discovery":
         content = <Discovery />;
         break;
-      case '/scan':
+      case "/scan":
         content = <BarcodeScanner />;
         break;
-      case '/fridge':
+      case "/fridge":
         content = <FridgePage />;
         break;
       default:
@@ -54,10 +54,10 @@ class App extends Component {
           <BrowserRouter>
             <Controlbar value={sidebarOpened} />
             <div
-              style={{ display: 'flex', flexDirection: 'row', height: '100%' }}
+              style={{ display: "flex", flexDirection: "row", height: "100%" }}
             >
               <Sidebar value={sidebarOpened} />
-              <div style={{ flexGrow: 1, padding: '20px' }}>{content}</div> 
+              <div style={{ flexGrow: 1, padding: "20px" }}>{content}</div>
             </div>
           </BrowserRouter>
         </AppContext.Provider>

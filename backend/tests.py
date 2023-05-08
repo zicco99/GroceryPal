@@ -1,4 +1,6 @@
 import unittest
+import json
+from flask import jsonify
 
 from sqlalchemy import create_engine
 from config import Config
@@ -16,95 +18,69 @@ from database.mappers.fridgeproduct import *
 from database.mappers.recipe import *
 from database.mappers.fridge import *
 
+#Schemas to deserialize etc.
+product_schema = ProductSchema()
+products_schema = ProductSchema(many=True)
+
+connection_string = 'postgresql://{}:{}@{}:{}/{}'.format(
+    Config.TEST_USERNAME_ROLE, Config.TEST_PASSWORD_ROLE, Config.TEST_DB_IP, Config.TEST_PORT, Config.TEST_DB_NAME)
 
 class TestCase(unittest.TestCase):
 
-    def setUp(self):
-        self.connection_string = 'postgresql://{}:{}@{}:{}/{}'.format(
-            Config.TEST_USERNAME_ROLE, Config.TEST_PASSWORD_ROLE, Config.TEST_DB_IP, Config.TEST_PORT, Config.TEST_DB_NAME)
+    @classmethod
+    def setUpClass(self):
+        self.app, self.session, self.metadata = create_app(Config,connection_string,True)
+        self.client = self.app.test_client()
 
-        app, session, metadata = create_app(Config, self.connection_string)
-        self.session = session
-        self.metadata = metadata
-        self.client = app.test_client
+    @classmethod
+    def tearDownClass(self):
+        pass
 
-    def tearDown(self):
-        engine = create_engine(self.connection_string)
-        self.metadata.drop_all(bind=engine)
+    ############################### ENDPOINT TESTING ############################################
+    #create
 
-    ############################### ENDPOINT TESTING #############################################
+    def test_products(self):
 
-    def test_get_feedbacks(self):
-        response = self.client().get('api/feedback')
-        print(response)
-        data = response.get_json()
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(data), 1)
-
-    """ def test_create_feedback(self):
-        data = {
-            'user_id': 1,
-            'recipe_id': 1,
-            'is_chosen': False,
-            'rating': 3,
-            'notes': 'Not bad.'
-        }
-
-        response = self.client().post('/feedback/', json=data)
-        data = response.get_json()
-
+        new_product = Product(
+            barcode=5410041001204,
+            ingredient_id=None,
+            name='TUC',
+            brand='boh',
+            labels=[True, False, True],  # Gluten-free, not vegan, healthy
+            eco_score=4,
+            nova_score=2,
+            big_image_url='https://example.com/image.jpg',
+            mini_image_url='https://example.com/mini_image.jpg',
+            # Not breakfast, lunch, not snack, dinner
+            meal=[False, True, False, True],
+            allergens=['nuts', 'peanuts', 'gluten'],
+            quantity=100)
+        
+        response = self.client.post(
+            'api/products/{}'.format(new_product.barcode), json=product_schema.dump(new_product))
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(data['user_id'], 1)
-        self.assertEqual(data['recipe_id'], 1)
-        self.assertEqual(data['is_chosen'], False)
-        self.assertEqual(data['rating'], 3)
-        self.assertEqual(data['notes'], 'Not bad.')
 
-    def test_get_feedback_by_id(self):
-        response = self.client().get('/feedback/1')
-        data = response.get_json()
+        with self.app.app_context():
+            new_product_serialized = product_schema.dump(new_product)
+            new_product_deserialized = product_schema.load(
+                new_product_serialized, session=self.session)
+            print(new_product_deserialized)
+            response = self.client.post('api/products/{}'.format(new_product.barcode), json = new_product_serialized)
+            self.assertEqual(response.status_code, 201)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(data['user_id'], 1)
-        self.assertEqual(data['recipe_id'], 1)
-        self.assertEqual(data['is_chosen'], True)
-        self.assertEqual(data['rating'], 4)
-        self.assertEqual(data['notes'], 'Delicious!')
+            response = self.client.get('api/products/{}'.format(new_product.barcode))
+            self.assertEqual(response.status_code, 200)
+            self.assertDictEqual(new_product_serialized, response.json)
 
-    def test_update_feedback(self):
-        data = {
-            'user_id': 1,
-            'recipe_id': 1,
-            'is_chosen': False,
-            'rating': 2,
-            'notes': 'Could be better.'
-        }
 
-        response = self.client().put('/feedback/1', json=data)
-        data = response.get_json()
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(data['user_id'], 1)
-        self.assertEqual(data['recipe_id'], 1)
-        self.assertEqual(data['is_chosen'], False)
-        self.assertEqual(data['rating'], 2)
-        self.assertEqual(data['notes'], 'Could be better.')
-
-    def test_delete_feedback(self):
-        response = self.client().delete('/feedback/1')
-
-        self.assertEqual(response.status_code, 200)
-
-        response = self.client().get('/feedback/1')
-        self.assertEqual(response.status_code, 404)
-
-    def test_get_user_feedbacks(self):
-        response = self.client().get('/feedback/user-feedbacks/1')
+    """ def test_get_feedbacks(self):
+        response = self.client.get('api/feedbacks')
         data = response.get_json()
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(data), 1) """
+
+    # add more test cases for other endpoints and edge cases
 
 
 if __name__ == '__main__':

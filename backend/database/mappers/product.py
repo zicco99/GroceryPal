@@ -6,10 +6,10 @@ from sqlalchemy.orm import registry, relationship
 
 from ..DBootstrap import custom_base
 
+
 class Product(custom_base):
     __tablename__ = 'product'
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    barcode = Column(String, unique=True)
+    barcode = Column(Integer, primary_key=True)
     ingredient_id = Column(Integer, ForeignKey('ingredient.id'))
     name = Column(String)
     brand = Column(String)
@@ -23,9 +23,24 @@ class Product(custom_base):
     quantity = Column(Integer)
 
     used_in_recipe_ingredient = relationship(
-        'RecipeIngredient', back_populates='product', uselist=False)
+        'RecipeIngredient', back_populates='product')
     used_in_fridge_product = relationship(
-        'FridgeProduct', back_populates='product', uselist=False)
+        'FridgeProduct', back_populates='product')
+
+    def __init__(self, barcode, ingredient_id=0, name="", brand="", labels=[], eco_score=0, nova_score=0, big_image_url="", mini_image_url="", meal=[False, False, False, False], allergens=[], quantity=0):
+        
+        self.barcode = barcode
+        self.ingredient_id = ingredient_id
+        self.name = name
+        self.brand = brand
+        self.labels = labels
+        self.eco_score = eco_score
+        self.nova_score = nova_score
+        self.big_image_url = big_image_url
+        self.mini_image_url = mini_image_url
+        self.meal = meal
+        self.allergens = allergens
+        self.quantity = quantity
 
 
 class ProductSchema(SQLAlchemySchema):
@@ -33,7 +48,6 @@ class ProductSchema(SQLAlchemySchema):
         model = Product
         load_instance = True
 
-    id = auto_field()
     barcode = auto_field()
     ingredient_id = auto_field()
     name = auto_field()
@@ -50,4 +64,3 @@ class ProductSchema(SQLAlchemySchema):
         'RecipeIngredientSchema', exclude=('product',))
     used_in_fridge_product = fields.Nested(
         'FridgeProductSchema', exclude=('product',))
-

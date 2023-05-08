@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, request
 from psycopg2 import IntegrityError
 from database.DBootstrap import *
 from controllers.user_contr import insert_db_if_misses
+from sqlalchemy.exc import *
 
 bp = Blueprint('feedback', __name__)
 session = None
@@ -11,28 +12,20 @@ feedback_schema = FeedbackSchema()
 feedbacks_schema = FeedbackSchema(many=True)
 
 
-
 @bp.route('/', methods=['GET'])
 def get_feedbacks():
     feedbacks = session.query(Feedback).all()
-    return jsonify(feedbacks_schema(feedbacks))
+    return jsonify(feedbacks_schema.dump(feedbacks))
 
 
 @bp.route('/', methods=['POST'])
 def create_feedback():
-    data = request.json
-    user_id = data.get('user_id')
-    recipe_id = data.get('recipe_id')
-    is_chosen = data.get('is_chosen')
-    rating = data.get('rating')
-    notes = data.get('notes')
-
     try:
-        feedback = Feedback(user_id=user_id, recipe_id=recipe_id,
-                            is_chosen=is_chosen, rating=rating, notes=notes)
-        session.add(feedback)
+        #Here should be coded some data control
+        session.add(feedbacks_schema.load(request.json))
         session.commit()
-        return jsonify(feedback_schema.dump(feedback)), 201
+        return jsonify(request.json), 201
+    
     except IntegrityError:
         session.rollback()
         return jsonify({'message': 'User or Recipe does not exist'}), 400

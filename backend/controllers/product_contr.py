@@ -1,24 +1,101 @@
 import sys
+from marshmallow import ValidationError
+from psycopg2 import IntegrityError
 import requests
+from sqlalchemy import Engine
 sys.path.append("../")
 from database.DBootstrap import *
 from flask import Blueprint, jsonify, request
+from config import Config
 
 bp = Blueprint('product', __name__)
 
+product_schema = ProductSchema()
+products_schema = ProductSchema(many=True)
 
-@bp.route("/product/<barcode>", methods=['GET', "POST"])
-def product(barcode):
+engine = None
 
-    if request.method == 'GET':
-        return get_product(barcode)
+# CRUD endpoints
 
-    if request.method == 'POST':
-        old_info = get_product(barcode)
-        new_info = ProductSchema().load(request.form['product_json_updated'])
+#get
+@bp.route("/<int:barcode>", methods=["GET"])
+def get_product(barcode):
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    product = session.query(Product).filter(Product.barcode == barcode).first()
+    if not product:
+        openfood_product = get_by_openfood(barcode)
+        if not openfood_product:
+            return product_schema.dump(Product(barcode)), 404
+        else:
+            return product_schema.dump(openfood_product), 200
+
+    return product_schema.dump(product), 200
+
+#create
+@bp.route("/<int:barcode>", methods = ["POST"])
+def create_product(barcode):
+    try:
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        product = product_schema.load(request.json, session=session)
+    except (ValidationError,ValueError) as err:
+        print(str(err))
+        return jsonify({"error": str(err)}), 400
+
+    if session.query(Product).filter(Product.barcode == barcode).first():
+        return jsonify({"error": "Product already exists"}), 409
+
+    session.add(product)
+    session.commit()
+
+    return jsonify(request.json), 201
+    
+#update
 
 
-""" @app.route('/product/<barcode>', methods=['GET',"POST"])
+@bp.route("/<int:barcode>", methods=["PUT"])
+def update_product(barcode):
+    global session
+    try:
+        product = product_schema.load(request.json, session=session)
+    except ValidationError as err:
+        print(str(err))
+        return jsonify({"error": str(err)}), 400
+
+    existing_product = session.query(Product).get(barcode)
+    if not existing_product:
+        return None, 404
+
+    existing_product.name = product.name
+    existing_product.description = product.description
+    existing_product.brand = product.brand
+    existing_product.category = product.category
+    existing_product.weight = product.weight
+    existing_product.image_url = product.image_url
+
+    session.commit()
+    return jsonify(product_schema.dump(existing_product)), 204
+
+
+
+#delete
+@bp.route("/<int:barcode>", methods=["DELETE"])
+def delete_product(barcode):
+    global session
+    product = product_schema.load(request.json, session=session)
+    existing_product = session.query(Product).get(barcode)
+    if not existing_product:
+        return None, 404
+
+    session.delete(existing_product)
+    session.commit()
+    return jsonify(product_schema.dump(existing_product)), 204
+
+
+
+""" 
+    @app.route('/product/<barcode>', methods=['GET',"POST"])
     def barcode(barcode):
         if request.method=='GET':
             getProd
@@ -111,11 +188,6 @@ def product(barcode):
 
     return '{}@{}'.format(data[index]['prodotto'],data[index]['img_prod']) """
 
-#Endpoints controller
-product_schema = ProductSchema()
-
-# Microservices and daemon threads functions
-
 
 def insert_product(p):
     try:
@@ -134,52 +206,6 @@ def update_product(p):
     except Exception as e:
         session.rollback()
         print(e)
-
-
-def get_product(barcode):
-
-    # Check if product already exists
-    existingProduct = session.query(Product).filter(
-        Product.barcode == barcode).first()
-    if existingProduct:
-        return jsonify(ProductSchema().dump(existingProduct))
-
-    #If it is not in DB -> retrieve info from OpenFood
-    r = requests.get(
-        'https://it.openfoodfacts.org/api/v0/product/{}.json'.format(barcode))
-    info = r.json().get("product")
-
-    #If does not exists on OpenFood -> return an empty product obj
-    if (not info):
-        p = Product(barcode=barcode, name="", brand="", big_image_url="", mini_image_url="",
-                    quantity="", allergens="", eco_score="", nova_score="")
-        return jsonify(ProductSchema.dump(p))
-    else:
-        #Basic info
-        name = info.get("product_name")
-        brand = info.get("brands")
-        big = info.get("image_front_small_url")
-        mini = info.get("image_front_url")
-        quantity = info.get("product_quantity")
-
-        #Additional info
-        allergens = []
-        for all in info.get("allergens").split(","):
-            allergens.append(all)
-
-        eco_score = None
-        if (info.get("ecoscore_extended_data")):
-            eco_score = info["ecoscore_extended_data"].get(
-                "ecoscore_grade")
-
-        nova_score = info.get("nova_group")
-
-        p = Product(barcode=barcode, name=name, brand=brand, big_image_url=big, mini_image_url=mini,
-                    quantity=quantity, allergens=allergens, eco_score=eco_score, nova_score=nova_score)
-
-        insert_product(p)
-
-        return jsonify(ProductSchema.dump(p))
 
 
 """ def create_product():
@@ -262,3 +288,39 @@ def delete_product(id):
 
     # Return a success message in the response
     return jsonify({"message": "Product successfully deleted."}) """
+
+
+# Auxiliary functions 
+
+def get_by_openfood(barcode):
+    r = requests.get('https://it.openfoodfacts.org/api/v0/product/{}.json'.format(barcode))
+    info = r.json().get("product")
+
+    #If does not exists on OpenFood -> return an empty product obj
+    if (not info):
+        return None
+    
+    else:
+        #Basic info
+        name = info.get("product_name")
+        brand = info.get("brands")
+        big = info.get("image_front_small_url")
+        mini = info.get("image_front_url")
+        quantity = info.get("product_quantity")
+
+        #Additional info
+        allergens = []
+        for all in info.get("allergens").split(","):
+            allergens.append(all)
+
+        eco_score = None
+        if (info.get("ecoscore_extended_data")):
+            eco_score = info["ecoscore_extended_data"].get(
+                "ecoscore_grade")
+
+        nova_score = info.get("nova_group")
+
+        p = Product(barcode=barcode, name=name, brand=brand, big_image_url=big, mini_image_url=mini,
+                    quantity=quantity, allergens=allergens, eco_score=eco_score, nova_score=nova_score)
+
+        return p

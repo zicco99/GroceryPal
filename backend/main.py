@@ -13,7 +13,7 @@ from giallozafferano_scraping.scraping import scrap
 import threading
 
 
-def create_app(config_class, connection_string):
+def create_app(config_class, connection_string, is_debug_db):
 
     app = Flask(__name__, static_folder='../frontend/dist/assets',
                 template_folder='../frontend/dist')
@@ -53,6 +53,18 @@ def create_app(config_class, connection_string):
     app.register_blueprint(user_contr.bp, url_prefix='/api/users')
     app.register_blueprint(userfridge_contr.bp, url_prefix='/api/userfridges')
 
+    session, metadata, engine = bootstrap_db(connection_string, is_debug_db)
+
+    product_contr.engine = engine
+
+    feedback_contr.engine = engine
+    fridge_contr.engine = engine
+    fridgeproduct_contr.engine = engine
+    ingredient_contr.engine = engine
+    login_contr.engine = engine
+    recipe_contr.engine = engine
+    user_contr.engine = engine
+    
     # Set up route for serving static CSS files
     @app.route('/static/<path:path>.css')
     def css(path):
@@ -74,16 +86,6 @@ def create_app(config_class, connection_string):
         logout_user()
         return redirect("/")
 
-    session, metadata = bootstrap_db(connection_string)
-
-    feedback_contr.session = session
-    fridge_contr.session = session
-    fridgeproduct_contr.session = session
-    ingredient_contr.session = session
-    login_contr.session = session
-    recipe_contr.session = session
-    user_contr.session = session
-
     return app, session, metadata
 
 
@@ -91,7 +93,7 @@ if __name__ == '__main__':
     connection_string = 'postgresql://{}:{}@{}:{}/{}'.format(
         Config.USERNAME_ROLE, Config.PASSWORD_ROLE, Config.DB_IP, Config.PORT, Config.DB_NAME)
     
-    app, session, metadata = create_app(Config, connection_string)
+    app, session, metadata = create_app(Config, connection_string, False)
     app.run(debug=True, port=4000, host='localhost')
 
     # Start a background thread for web scraping

@@ -12,7 +12,7 @@ class RecipeIngredient(custom_base):
     id = Column(Integer, autoincrement=True, primary_key=True)
     recipe_id = Column(Integer, ForeignKey('recipe.id'))
     ingredient_id = Column(Integer, ForeignKey('ingredient.id'))
-    product_id = Column(Integer, ForeignKey('product.id'))
+    product_barcode = Column(Integer, ForeignKey('product.barcode'))
     amount_text = Column(String)
     amount = Column(Float)
 
@@ -32,6 +32,7 @@ class RecipeIngredientSchema(SQLAlchemySchema):
     id = auto_field()
     recipe_id = auto_field()
     ingredient_id = auto_field()
+    product_barcode = auto_field()
     amount_text = auto_field()
     amount = auto_field()
 

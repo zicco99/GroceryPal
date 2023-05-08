@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import {
   BrowserMultiFormatReader,
   NotFoundException,
   BarcodeFormat,
-} from '@zxing/library';
-import ProductForm from './ProductForm';
+} from "@zxing/library";
+import ProductForm from "./ProductForm";
 
 class BarcodeScanner extends Component {
   constructor(props) {
@@ -40,63 +40,66 @@ class BarcodeScanner extends Component {
         },
       };
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      const videoElement = document.getElementById('barcode-scanner');
+      const videoElement = document.getElementById("barcode-scanner");
 
       // check if video is already playing
       if (!this.videoPlaying) {
         videoElement.srcObject = stream;
         codeReader.decodeFromVideoDevice(
           selectedDeviceId,
-          'barcode-scanner',
+          "barcode-scanner",
           (result, error) => {
             if (result) {
               this.handleBarcode(result.getText());
             } else if (error && !(error instanceof NotFoundException)) {
               console.error(error);
-              this.setState({ error: 'Failed to read barcode.' });
+              this.setState({ error: "Failed to read barcode." });
             }
           }
         );
-        this.handleBarcode('3017620422003');
+        this.handleBarcode("3017620422003");
         this.videoPlaying = true;
       }
     } catch (err) {
-      this.setState({ error: 'Failed to initialize barcode scanner.' });
+      this.setState({ error: "Failed to initialize barcode scanner." });
     }
   }
 
-  handleBarcode = async barcode => {
+  handleBarcode = async (barcode) => {
     try {
-      const response = await fetch(`http://localhost:4000/product/${barcode}`);
+      const response = await fetch(`http://localhost:4000/api/products/${barcode}`);
       if (!response.ok) {
         throw new Error(`HTTP Error: ${response.status}`);
       }
       const p = await response.json();
-      this.setState({ product: p, mode: 'form' });
+      this.setState({ product: p, mode: "form" });
     } catch (error) {
       console.error(error);
-      this.setState({ error: 'Failed to retrieve product information.' });
+      this.setState({ error: "Failed to retrieve product information." });
     }
   };
 
-  onFormButtonClick = async product => {
+  onFormButtonClick = async (product) => {
     try {
-      const response = await fetch(`http://localhost:4000/product/${product.barcode}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(product),
-      });
-      
+      const response = await fetch(
+        `http://localhost:4000/product/${product.barcode}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(product),
+        }
+      );
+
       if (!response.ok) {
         throw new Error(`HTTP Error: ${response.status}`);
       }
 
-      this.setState({ product: null, mode: 'video' });
+      this.setState({ product: null, mode: "video" });
     } catch (error) {
       console.error(error);
-      this.setState({ error: 'Failed to retrieve product information.' });
+      this.setState({ error: "Failed to retrieve product information." });
     }
   };
 
@@ -104,7 +107,7 @@ class BarcodeScanner extends Component {
     const { product, mode } = this.state;
     return (
       <div>
-        {mode === 'video' ? (
+        {mode === "video" ? (
           <video id="barcode-scanner" playsInline autoPlay muted />
         ) : (
           product && <ProductForm {...product} onFormButtonClick />
